@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Blog.Models.Post>;
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Pager pager = new Pager();
+
+    int pageNo = 0;
+
+    if(ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+<div>
+    <div>
+        <h1>Posts</h1>
+    </div>
+    <div>
+        <a asp-area="" asp-controller="Post" asp-action="Add" class="btn btn-primary">Create a post</a>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+    @foreach(Post p in Model)
+    {
+        if (p == null) continue;
+        <div class="col">
+            <div class="card h-100">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">@p.Heading</h5>
+                    <p class="card-text">@p.ShortDescription</p>
+                    @foreach(Tag tag in p.Tags)
+                    {
+                        <ul class="list-group list-group-horizontal">
+                            <li class="list-group-item">@tag.DisplayName</li>
+                        </ul>
+                    }
+
+                </div>
+                <div class="card-footer">
+                    <small class="text-body-secondary">Published @p.PublishedDate by @p.Author</small>
+                </div>
+                <div>
+
+                    <a asp-action="Details" asp-route-page="0" asp-route-id="@p.ID" class="btn btn-dark btn-sm">Read more</a>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<nav aria-label="Page navigation example">
+        <!--<li class="page-item disabled"> </li> -->
+        @if(pager.TotalPages > 0){
+            <ul class="pagination justify-content-center">
+
+            @{
+                int nextPage = (@pager.CurrentPage + 1);
+                int prevPage = (@pager.CurrentPage - 1);
+
+             }
+            <li class="page-item">
+                <a class="page-link" asp-controller="Post" asp-action="Index" asp-route-page="@prevPage">Previous</a>
+            </li>
+
+                @for(var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge == pager.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-controller="Post" asp-action="Index" asp-route-page="@pge">@pge</a>
+                    </li>
+                }
+
+            <li class="page-item">
+                <a class="page-link" asp-controller="Post" asp-action="Index" asp-route-page="@nextPage">Next</a>
+            </li>
+            </ul>
+        }
+</nav>

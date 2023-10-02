@@ -1,0 +1,96 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Blog.Models.ModelViews.PostTagsModelView;
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<IdentityUser> signInManager;
+@inject UserManager<IdentityUser> userManager;
+
+<div class="bg-secondary bg-opacity-10 py-2">
+    <div class="conainer">
+        <h3>Edit your post</h3>
+
+    </div>
+    @if (User.Identity.Name.Equals(Model.Post.Author) || User.IsInRole("Admin"))
+    {
+        <div class="container py-5">
+            <form asp-action="Edit">
+                <div class="mb-3">
+                    <label class="form-label">Heading</label>
+                    <input type="text" class="form-control" id="heading" name="heading" asp-for="Post.Heading" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="pagetitle" asp-for="Post.PageTitle" aspitem />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Contents of your post</label>
+                    <textarea class="form-control" id="content" rows="3" name="content" asp-for="Post.Content"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-control" id="description" name="shortdescription" asp-for="Post.ShortDescription" />
+                </div>
+
+                <!---
+
+                <div class="mb-3">
+                    <label class="form-label">Image</label>
+                    <input type="file" class="form-control" id="urlhandle" name="urlhandle" asp-for="Post.Image" />
+                </div>
+                -->
+
+                <label class="form-label">Select your tags</label>
+                <ul class="list-group mb-3" name="tagList" id="tagList">
+                    @foreach (var tags in Model.Tags)
+                    {
+                        <li class="list-group-item">
+                            @if (Model.Post.Tags.Contains(tags))
+                            {
+                                <input class="form-check-input me-1" name="taggedItems" type="checkbox" value="@tags.ID" aria-label="false" checked>
+
+                            }
+                            else
+                            {
+                                <input class="form-check-input me-1" name="taggedItems" type="checkbox" value="@tags.ID" aria-label="false">
+
+                            }
+                            @tags.DisplayName
+
+                        </li>
+                    }
+
+
+                </ul>
+
+                <div class="mb-3">
+                    <button type="submit" value="Save" class="btn btn-success">Save</button>
+                    <!--<button type="submit" value="Delete" class="btn btn-success">Delete</button> -->
+                    <!---<a asp-action="Delete" asp-route="@Model.Post.ID" class="btn btn-dark btn-sm">Delete</a>-->
+                </div>
+
+
+            </form>
+
+            <!--<a asp-area="" asp-controller="Post" asp-route-id="@Model.Post.ID" asp-action="Delete">Delete</a> | -->
+            <a asp-action="Delete" asp-route-id="@Model.Post.ID" class="btn btn-danger">Delete</a>
+            <a asp-action="Index">Back to List</a>
+
+        </div>
+    }
+    else
+    {
+        <p>Except... it isn't your post though is it... GET OUT! </p>
+    }
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

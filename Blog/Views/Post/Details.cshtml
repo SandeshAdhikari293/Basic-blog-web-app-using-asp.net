@@ -1,0 +1,115 @@
+﻿@model Blog.Models.ModelViews.CommentPostModelView;
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<IdentityUser> signInManager;
+@inject UserManager<IdentityUser> userManager;
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Pager pager = new Pager();
+
+    int pageNo = 0;
+
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+
+
+<div class="bg-secondary bg-opacity-10 py-2 mb-5">
+    <div class="conainer">
+        <h1>@Model.Post.Heading</h1>
+
+    </div>
+
+    <div class="container py-5">
+        <h3>@Model.Post.PageTitle</h3>
+        <p>@Model.Post.Content</p>
+
+        <ul class="list-group list-group-horizontal">
+            @foreach (Tag tag in Model.Post.Tags)
+            {
+              <li class="list-group-item">@tag.DisplayName</li>
+            }
+        </ul>
+            <div>
+            @if (User.Identity.Name.Equals(Model.Post.Author) || User.IsInRole("Admin"))
+                {
+                <a asp-action="Edit" asp-route-id="@Model.Post.ID" class="btn btn-dark btn-sm">Edit</a>
+                }
+            </div>
+    </div>
+
+
+<div>
+        <div class="page-header">
+            <h1><small class="pull-right">@Model.Post.Comments.ToArray().Length</small> Comments </h1>
+        </div>
+    <form method="post" asp-action="Comment">
+        <label class="form-label">Post a comment</label>
+        <textarea class="form-control" id="comment" rows="3" name="content" asp-for="Content"></textarea>
+        <input type="hidden" asp-for="Post.ID" />
+
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Post</button>
+        </div>
+    </form>
+
+</div>
+
+    <div>
+        <div class="row flex-row" >
+            <div class="col-md-8">
+                @foreach (Comment c in Model.Comments)
+                {
+                    <div class="comments-list card">
+                        <div class="media">
+                            <div class="media-body">
+
+                                <h4 class="media-heading user_name">@c.Author</h4>
+                                <p class="pull-right"><small>Posted on @c.Posted</small></p>
+                                @c.Content
+
+                                <p><small><a href="">Like</a> - <a href="">Share</a></small></p>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+    <nav aria-label="Page navigation example">
+        <!--<li class="page-item disabled"> </li> -->
+        @if (pager.TotalPages > 0)
+        {
+            <ul class="pagination justify-content-center">
+
+                @{
+                    int nextPage = (@pager.CurrentPage + 1);
+                    int prevPage = (@pager.CurrentPage - 1);
+
+                }
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Post" asp-action="Details" asp-route-id="@Model.Post.ID" asp-route-page="@prevPage">Previous</a>
+                </li>
+
+                @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                {
+                    <li class="page-item @(pge == pager.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-controller="Post" asp-action="Details" asp-route-id="@Model.Post.ID" asp-route-page="@pge">@pge</a>
+                    </li>
+                }
+
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Post" asp-action="Details" asp-route-id="@Model.Post.ID" asp-route-page="@nextPage">Next</a>
+                </li>
+            </ul>
+        }
+    </nav>
